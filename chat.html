@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supphy Canlı Destek</title>
+  <style>
+    body { font-family: Arial; background: #121212; color: #fff; padding: 20px; }
+    #chat-container { max-width: 600px; margin: auto; height: 400px; overflow-y: auto; background: #222; padding: 10px; border-radius: 8px; }
+    .message { margin-bottom: 10px; padding: 8px 12px; border-radius: 12px; max-width: 70%; }
+    .sent { background: #4fc3f7; color: #000; margin-left: auto; }
+    .received { background: #444; color: #fff; margin-right: auto; }
+    #input-container { display: flex; max-width: 600px; margin: 20px auto 0; }
+    #chat-input { flex-grow: 1; padding: 10px; border-radius: 12px; border: none; }
+    #send-btn { padding: 10px 20px; margin-left: 10px; border: none; border-radius: 12px; background: #4fc3f7; color: #000; font-weight: bold; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>Supphy Canlı Destek</h1>
+  <div id="chat-container"></div>
+
+  <div id="input-container">
+    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." />
+    <button id="send-btn">Gönder</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Firebase yapılandırma (kendi projenin config’i)
+    const firebaseConfig = {
+      apiKey: "API_KEYİNİZİ_BURAYA_YERLEŞTİRİN",
+      authDomain: "PROJECT_ID.firebaseapp.com",
+      projectId: "PROJECT_ID",
+      storageBucket: "PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const chatContainer = document.getElementById('chat-container');
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    let currentUser;
+
+    // Kullanıcı giriş kontrolü
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        alert('Giriş yapmanız gerekiyor!');
+        window.location.href = 'index.html'; // Giriş sayfanı buraya yaz
+        return;
+      }
+      currentUser = user;
+      listenMessages();
+    });
+
+    // Mesajları gerçek zamanlı dinle
+    function listenMessages() {
+      const q = query(collection(db, "chats"), orderBy("timestamp"));
+      onSnapshot(q, snapshot => {
+        chatContainer.innerHTML = "";
+        snapshot.forEach(doc => {
+          const msg = doc.data();
+          const div = document.createElement('div');
+          div.textContent = msg.text;
+          div.className = 'message ' + (msg.senderId === currentUser.uid ? 'sent' : 'received');
+          chatContainer.appendChild(div);
+        });
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      });
+    }
+
+    // Mesaj gönderme
+    sendBtn.onclick = async () => {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      await addDoc(collection(db, "chats"), {
+        senderId: currentUser.uid,
+        text: text,
+        timestamp: serverTimestamp()
+      });
+      chatInput.value = "";
+    };
+
+    // Enter tuşu ile de gönder
+    chatInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendBtn.onclick();
+    });
+  </script>
+
+</body>
+</html>
