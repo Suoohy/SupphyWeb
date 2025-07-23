@@ -3,67 +3,144 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kullanıcı Paneli - Supphy Hosting</title>
+  <title>Supphy Hosting - Kullanıcı Paneli</title>
   <style>
-    /* Temiz, modern tasarım */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: #fff;
-      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background: #2c2c44;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       padding: 20px;
+      transition: width 0.3s ease;
+      overflow: hidden;
     }
 
-    .panel-container {
-      background: rgba(0,0,0,0.5);
-      border-radius: 15px;
-      padding: 30px 40px;
-      max-width: 400px;
-      width: 100%;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      text-align: center;
+    .sidebar.collapsed {
+      width: 70px;
     }
 
-    h1 {
-      margin-bottom: 20px;
+    .sidebar h2 {
+      margin: 0 0 30px 0;
       font-weight: 700;
-      font-size: 2.5rem;
+      font-size: 1.8rem;
+      color: #4fc3f7;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-    }
-
-    button {
-      background: #ff416c;  /* Pembe-kırmızı degrade */
-      background: linear-gradient(to right, #ff416c, #ff4b2b);
-      border: none;
-      padding: 15px 30px;
-      font-size: 1rem;
-      border-radius: 50px;
-      color: #fff;
+    .menu-item {
+      padding: 15px 20px;
+      margin-bottom: 15px;
       cursor: pointer;
+      border-radius: 10px;
       transition: background 0.3s ease;
-      box-shadow: 0 4px 15px rgba(255,65,108,0.5);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    button:hover {
-      background: linear-gradient(to right, #ff4b2b, #ff416c);
+    .menu-item:hover {
+      background: #4fc3f7;
+      color: #1e1e2f;
+    }
+
+    .menu-item.active {
+      background: #fff;
+      color: #1e1e2f;
+      font-weight: 700;
+    }
+
+    .toggle-btn {
+      margin-top: auto;
+      padding: 15px 20px;
+      background: #ff4b2b;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-btn:hover {
+      background: #d32f2f;
+    }
+
+    /* Content */
+    .content {
+      flex-grow: 1;
+      padding: 40px;
+      background: rgba(0,0,0,0.2);
+      overflow-y: auto;
+    }
+
+    .content h1 {
+      margin-top: 0;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .content p {
+      font-size: 1.2rem;
+      line-height: 1.5;
+      max-width: 700px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .sidebar.collapsed {
+        width: 100%;
+      }
+      .menu-item {
+        margin-bottom: 0;
+        margin-right: 10px;
+        padding: 10px 15px;
+      }
+      .content {
+        padding: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="panel-container">
-    <h1>Hoşgeldin!</h1>
-    <p>Kullanıcı: <span id="user-email">...</span></p>
-    <button id="logout-btn">Çıkış Yap</button>
-  </div>
+  <nav class="sidebar" id="sidebar">
+    <h2>Supphy</h2>
+    <div class="menu-item active" data-section="profile">Profil</div>
+    <div class="menu-item" data-section="settings">Ayarlar</div>
+    <div class="menu-item" data-section="help">Yardım</div>
+    <button class="toggle-btn" id="logout-btn">Çıkış Yap</button>
+  </nav>
+
+  <main class="content" id="content">
+    <h1>Profil</h1>
+    <p>Hoşgeldin! Burada profil bilgilerini görebilir, ayarlarını değiştirebilir veya yardım alabilirsin.</p>
+  </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -81,14 +158,43 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Kullanıcı giriş kontrolü ve e-posta gösterimi
+    // Kullanıcı doğrulama ve yönlendirme
     onAuthStateChanged(auth, user => {
-      if (user) {
-        document.getElementById('user-email').textContent = user.email;
-      } else {
-        // Giriş yoksa anasayfaya yönlendir
+      if (!user) {
         window.location.href = "index.html";
       }
+    });
+
+    // Menü elemanları ve içerik bölümleri
+    const menuItems = document.querySelectorAll('.menu-item');
+    const content = document.getElementById('content');
+
+    const sections = {
+      profile: {
+        title: "Profil",
+        content: `<p>Hoşgeldin! Burada profil bilgilerini görebilir, ayarlarını değiştirebilir veya yardım alabilirsin.</p>`
+      },
+      settings: {
+        title: "Ayarlar",
+        content: `<p>Burada hesap ayarlarını değiştirebilirsin. (Örneğin; e-posta, şifre vb.)</p>`
+      },
+      help: {
+        title: "Yardım",
+        content: `<p>Herhangi bir sorunun varsa buradan destek alabilirsin.</p>`
+      }
+    };
+
+    // Menü tıklamalarını dinle
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // Aktif menüyü değiştir
+        menuItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // İçeriği değiştir
+        const section = item.getAttribute('data-section');
+        content.innerHTML = `<h1>${sections[section].title}</h1>${sections[section].content}`;
+      });
     });
 
     // Çıkış yap butonu
