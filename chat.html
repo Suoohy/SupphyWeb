@@ -2,107 +2,154 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
-<title>Canlı Destek Widget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Supphy Hosting Canlı Destek</title>
 <style>
-  /* Buton stil */
+  /* Genel sıfırlama */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body, html {
+    height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #fff;
+  }
+
+  /* Chat butonu */
   #chat-button {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: #4fc3f7;
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    font-size: 32px;
+    color: white;
     border: none;
     cursor: pointer;
-    font-size: 30px;
-    color: #000;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 12px rgba(37,117,252,0.6);
+    transition: background 0.3s ease;
+    z-index: 9999;
+  }
+  #chat-button:hover {
+    background: linear-gradient(135deg, #2575fc 0%, #6a11cb 100%);
   }
 
-  /* Chat kutusu gizli başlangıçta */
+  /* Chat kutusu */
   #chat-box {
     position: fixed;
-    bottom: 90px;
+    bottom: 100px;
     right: 20px;
-    width: 320px;
-    max-height: 400px;
-    background: #222;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    width: 350px;
+    max-height: 450px;
+    background: #1f1f1f;
+    border-radius: 15px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.7);
     display: none;
     flex-direction: column;
     overflow: hidden;
+    z-index: 9998;
   }
 
+  /* Başlık */
   #chat-header {
-    background: #4fc3f7;
-    padding: 10px;
-    color: #000;
-    font-weight: bold;
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    padding: 15px 20px;
+    font-weight: 700;
+    font-size: 18px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
+  #chat-close {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 24px;
+  }
+
+  /* Mesajlar alanı */
   #chat-messages {
     flex: 1;
-    padding: 10px;
+    padding: 15px;
     overflow-y: auto;
-    color: #fff;
+    background: #121212;
   }
 
+  /* Mesaj balonları */
+  .message {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .sent {
+    background: #2575fc;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .received {
+    background: #333;
+    color: white;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  /* Mesaj yazma alanı */
   #chat-input-container {
     display: flex;
-    padding: 10px;
-    background: #111;
+    border-top: 1px solid #333;
+    padding: 12px 15px;
+    background: #1f1f1f;
   }
 
   #chat-input {
     flex-grow: 1;
-    border-radius: 10px;
+    border-radius: 25px;
     border: none;
-    padding: 8px 12px;
+    padding: 10px 20px;
     font-size: 14px;
+    background: #333;
+    color: white;
+    outline: none;
   }
 
   #send-btn {
-    background: #4fc3f7;
+    background: #2575fc;
     border: none;
-    color: #000;
-    font-weight: bold;
-    padding: 8px 12px;
-    margin-left: 8px;
-    border-radius: 10px;
+    color: white;
+    padding: 10px 18px;
+    margin-left: 12px;
+    border-radius: 25px;
+    font-weight: 600;
     cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #send-btn:hover {
+    background: #1b5edb;
   }
 
-  .message {
-    margin-bottom: 10px;
-    padding: 8px 12px;
-    border-radius: 12px;
-    max-width: 70%;
-    word-wrap: break-word;
-  }
-  .sent {
-    background: #4fc3f7;
-    color: #000;
-    margin-left: auto;
-  }
-  .received {
-    background: #444;
-    color: #fff;
-    margin-right: auto;
-  }
 </style>
 </head>
 <body>
 
-<button id="chat-button">💬</button>
+<button id="chat-button" title="Canlı Destek">💬</button>
 
-<div id="chat-box">
-  <div id="chat-header">Canlı Destek</div>
-  <div id="chat-messages"></div>
+<div id="chat-box" role="dialog" aria-modal="true" aria-labelledby="chat-header">
+  <div id="chat-header">
+    Canlı Destek
+    <span id="chat-close" title="Kapat">×</span>
+  </div>
+  <div id="chat-messages" aria-live="polite" aria-relevant="additions"></div>
   <div id="chat-input-container">
-    <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." />
-    <button id="send-btn">Gönder</button>
+    <input id="chat-input" type="text" placeholder="Mesajınızı yazın..." autocomplete="off" aria-label="Mesajınızı yazın" />
+    <button id="send-btn" aria-label="Mesaj Gönder">Gönder</button>
   </div>
 </div>
 
@@ -111,41 +158,35 @@
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  // Firebase configini kendi projenle değiştir
+  // Buraya Firebase projenin config bilgilerini koy
   const firebaseConfig = {
-    apiKey: "API_KEYİNİZ",
-    authDomain: "PROJECT_ID.firebaseapp.com",
-    projectId: "PROJECT_ID",
-    storageBucket: "PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
+    apiKey: "AIzaSyCI4Kw-lDMWMI6V5WIQPPTVtzzAUic6ZxU",
+    authDomain: "deneme-giris-3c8e1.firebaseapp.com",
+    projectId: "deneme-giris-3c8e1",
+    storageBucket: "deneme-giris-3c8e1.firebasestorage.app",
+    messagingSenderId: "808992598321",
+    appId: "1:808992598321:web:38e55dbae8d8b3d8b66810"
   };
 
+  // Firebase başlat
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
+  // Elementler
   const chatButton = document.getElementById('chat-button');
   const chatBox = document.getElementById('chat-box');
+  const chatClose = document.getElementById('chat-close');
   const chatMessages = document.getElementById('chat-messages');
   const chatInput = document.getElementById('chat-input');
   const sendBtn = document.getElementById('send-btn');
 
   let currentUser;
 
-  // Butona tıklayınca chat kutusunu aç/kapa
-  chatButton.onclick = () => {
-    if (chatBox.style.display === "flex") {
-      chatBox.style.display = "none";
-    } else {
-      chatBox.style.display = "flex";
-    }
-  };
-
-  // Kullanıcı giriş kontrolü
+  // Kullanıcı girişini kontrol et
   onAuthStateChanged(auth, user => {
     if (!user) {
-      alert("Lütfen giriş yapın!");
+      alert("Lütfen giriş yapınız!");
       window.location.href = "index.html"; // Giriş sayfası
       return;
     }
@@ -153,7 +194,22 @@
     listenMessages();
   });
 
-  // Mesajları dinle ve göster
+  // Chat kutusunu aç/kapa
+  chatButton.addEventListener('click', () => {
+    if (chatBox.style.display === "flex" || window.getComputedStyle(chatBox).display === "flex") {
+      chatBox.style.display = "none";
+    } else {
+      chatBox.style.display = "flex";
+      chatInput.focus();
+    }
+  });
+
+  // Chat kutusunu kapatma
+  chatClose.addEventListener('click', () => {
+    chatBox.style.display = "none";
+  });
+
+  // Firestore'dan mesajları dinle
   function listenMessages() {
     const q = query(collection(db, "chats"), orderBy("timestamp"));
     onSnapshot(q, snapshot => {
@@ -169,21 +225,27 @@
     });
   }
 
-  // Mesaj gönder
-  sendBtn.onclick = async () => {
-    const text = chatInput.value.trim();
-    if (!text) return;
-    await addDoc(collection(db, "chats"), {
-      senderId: currentUser.uid,
-      text: text,
-      timestamp: serverTimestamp()
-    });
-    chatInput.value = "";
-  };
-
-  chatInput.addEventListener('keypress', e => {
-    if (e.key === 'Enter') sendBtn.onclick();
+  // Mesaj gönderme işlemi
+  sendBtn.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
   });
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (text.length === 0) return;
+
+    try {
+      await addDoc(collection(db, "chats"), {
+        senderId: currentUser.uid,
+        text,
+        timestamp: serverTimestamp()
+      });
+      chatInput.value = "";
+    } catch (error) {
+      alert("Mesaj gönderilemedi: " + error.message);
+    }
+  }
 </script>
 
 </body>
