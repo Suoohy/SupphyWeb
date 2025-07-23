@@ -2,48 +2,192 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8" />
-<title>Giriş Yap</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Supphy Hosting - Giriş</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+
+  /* Arka plan animasyonu */
+  body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    background: linear-gradient(270deg, #6a11cb, #2575fc, #6a11cb);
+    background-size: 600% 600%;
+    animation: gradientBG 16s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @keyframes gradientBG {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+
+  /* Kutu */
+  .login-container {
+    background: rgba(0, 0, 0, 0.75);
+    padding: 40px 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(37,117,252,0.6);
+    width: 350px;
+    text-align: center;
+    color: #fff;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+  }
+  .login-container:hover {
+    transform: scale(1.05);
+  }
+
+  /* Başlık */
+  .login-container h1 {
+    margin-bottom: 30px;
+    font-weight: 600;
+    font-size: 2.4rem;
+    letter-spacing: 1.2px;
+    text-shadow: 0 0 8px rgba(37,117,252,0.7);
+  }
+
+  /* Inputlar */
+  input[type="email"], input[type="password"] {
+    width: 100%;
+    padding: 14px 18px;
+    margin: 12px 0;
+    border-radius: 12px;
+    border: none;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    outline: none;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.15);
+    transition: background 0.3s ease;
+  }
+  input[type="email"]::placeholder, input[type="password"]::placeholder {
+    color: #ccc;
+  }
+  input[type="email"]:focus, input[type="password"]:focus {
+    background: rgba(255,255,255,0.25);
+  }
+
+  /* Butonlar */
+  button {
+    width: 100%;
+    padding: 14px 0;
+    margin-top: 20px;
+    border-radius: 12px;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(37,117,252,0.6);
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  button:hover {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    transform: scale(1.05);
+  }
+
+  /* Hata mesajı */
+  #error {
+    margin-top: 15px;
+    color: #ff6b6b;
+    font-weight: 600;
+    min-height: 24px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  #error.visible {
+    opacity: 1;
+  }
+</style>
 </head>
 <body>
-  <h2>Giriş Yap</h2>
-  <input id="email" type="email" placeholder="E-posta" /><br><br>
-  <input id="password" type="password" placeholder="Şifre" /><br><br>
+
+<div class="login-container" role="main" aria-label="Giriş formu">
+  <h1>Supphy Hosting</h1>
+  <input type="email" id="email" placeholder="E-posta adresiniz" autocomplete="email" required />
+  <input type="password" id="password" placeholder="Şifreniz" autocomplete="current-password" required />
   <button id="loginBtn">Giriş Yap</button>
+  <button id="registerBtn">Kayıt Ol</button>
+  <p id="error" role="alert"></p>
+</div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCI4Kw-lDMWMI6V5WIQPPTVtzzAUic6ZxU",
-      authDomain: "deneme-giris-3c8e1.firebaseapp.com",
-      projectId: "deneme-giris-3c8e1",
-      storageBucket: "deneme-giris-3c8e1.firebasestorage.app",
-      messagingSenderId: "808992598321",
-      appId: "1:808992598321:web:38e55dbae8d8b3d8b66810",
-      measurementId: "G-GJS22L3XBS"
-    };
+  const firebaseConfig = {
+    apiKey: "API_KEYİNİZ",
+    authDomain: "PROJECT_ID.firebaseapp.com",
+    projectId: "PROJECT_ID",
+    storageBucket: "PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-    const loginBtn = document.getElementById("loginBtn");
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const registerBtn = document.getElementById('registerBtn');
+  const errorEl = document.getElementById('error');
 
-    loginBtn.addEventListener("click", () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add('visible');
+  }
 
-      signInWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          // Başarılı girişte chat.html sayfasına yönlendir
-          window.location.href = "chat.html";
-        })
-        .catch((error) => {
-          alert("Giriş hatası: " + error.message);
-        });
-    });
-  </script>
+  function clearError() {
+    errorEl.textContent = '';
+    errorEl.classList.remove('visible');
+  }
+
+  loginBtn.addEventListener('click', async () => {
+    clearError();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      showError('Lütfen e-posta ve şifre girin.');
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // Giriş başarılıysa chat.html sayfasına yönlendir
+      window.location.href = "chat.html";
+    } catch (err) {
+      showError('Giriş başarısız: ' + err.message);
+    }
+  });
+
+  registerBtn.addEventListener('click', async () => {
+    clearError();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!email || !password) {
+      showError('Lütfen e-posta ve şifre girin.');
+      return;
+    }
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      // Kayıt başarılıysa chat.html sayfasına yönlendir
+      window.location.href = "chat.html";
+    } catch (err) {
+      showError('Kayıt başarısız: ' + err.message);
+    }
+  });
+</script>
+
 </body>
 </html>
