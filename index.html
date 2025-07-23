@@ -2,123 +2,185 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Supphy Hosting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Supphy Hosting - Giriş</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    * {
+      box-sizing: border-box;
     }
-
-    video#bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -1;
-    }
-
-    .overlay {
-      position: relative;
-      height: 100vh;
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       display: flex;
       justify-content: center;
       align-items: center;
-      backdrop-filter: blur(5px);
-      background-color: rgba(0, 0, 0, 0.3);
-      z-index: 1;
+      height: 100vh;
+      color: #fff;
     }
-
-    .form-container {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      width: 300px;
+    .container {
+      background: rgba(0,0,0,0.4);
+      padding: 40px;
+      border-radius: 12px;
+      width: 350px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+    h2 {
+      margin-bottom: 30px;
+      font-weight: 600;
       text-align: center;
-      color: #fff;
+      letter-spacing: 2px;
     }
-
-    .form-container input {
+    input[type="email"], input[type="password"] {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
+      padding: 12px 15px;
+      margin: 10px 0 20px 0;
       border: none;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-    }
-
-    .form-container input::placeholder {
-      color: #ccc;
-    }
-
-    .form-container button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(to right, #6a11cb, #2575fc);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
+      border-radius: 8px;
+      outline: none;
+      font-size: 1rem;
       transition: 0.3s;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
     }
-
-    .form-container button:hover {
-      opacity: 0.9;
+    input[type="email"]::placeholder, input[type="password"]::placeholder {
+      color: #ddd;
+    }
+    input[type="email"]:focus, input[type="password"]:focus {
+      background: rgba(255,255,255,0.2);
+      box-shadow: 0 0 8px #764ba2;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #764ba2;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #5b3783;
+    }
+    .links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      font-size: 0.9rem;
+    }
+    .links a {
+      color: #b3a3de;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .links a:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+    #error-msg {
+      margin-top: 15px;
+      color: #ff6b6b;
+      min-height: 20px;
+      font-weight: 600;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-
-  <video id="bg" autoplay muted loop playsinline>
-    <source src="bg.mp4" type="video/mp4">
-    Tarayıcınız video etiketini desteklemiyor.
-  </video>
-
-  <div class="overlay">
-    <div class="form-container">
-      <h2>Supphy Hosting</h2>
-      <input type="email" id="email" placeholder="E-posta">
-      <input type="password" id="password" placeholder="Şifre">
-      <button onclick="login()">Giriş Yap</button>
-      <button onclick="register()">Kayıt Ol</button>
-      <p id="error"></p>
+  <div class="container">
+    <h2>Supphy Hosting Giriş</h2>
+    <input type="email" id="email" placeholder="E-posta" />
+    <input type="password" id="password" placeholder="Şifre" />
+    <button id="login-btn">Giriş Yap</button>
+    <div class="links">
+      <a id="forgot-password">Şifremi Unuttum?</a>
+      <a id="register-btn">Kayıt Ol</a>
     </div>
+    <div id="error-msg"></div>
   </div>
 
-  <script type="module" src="auth.js"></script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <title>UID Öğrenme</title>
-</head>
-<body>
-  <h2>UID Öğrenme Sayfası</h2>
-
   <script type="module">
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    const auth = getAuth();
+    const firebaseConfig = {
+      apiKey: "AIzaSyCI4Kw-lDMWMI6V5WIQPPTVtzzAUic6ZxU",
+      authDomain: "deneme-giris-3c8e1.firebaseapp.com",
+      projectId: "deneme-giris-3c8e1",
+      storageBucket: "deneme-giris-3c8e1.appspot.com",
+      messagingSenderId: "808992598321",
+      appId: "1:808992598321:web:38e55dbae8d8b3d8b66810"
+    };
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("Senin UID’n:", user.uid);
-        alert("UID’n konsola yazıldı, kopyala!");
-      } else {
-        console.log("Giriş yapılmamış.");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorMsg = document.getElementById("error-msg");
+
+    // Giriş Yap
+    document.getElementById("login-btn").addEventListener("click", () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        errorMsg.textContent = "Lütfen e-posta ve şifreyi doldurun.";
+        return;
       }
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = "panel.html";
+        })
+        .catch((error) => {
+          errorMsg.textContent = error.message;
+        });
+    });
+
+    // Şifremi Unuttum
+    document.getElementById("forgot-password").addEventListener("click", () => {
+      const email = emailInput.value.trim();
+      if (!email) {
+        errorMsg.textContent = "Lütfen önce e-posta adresinizi girin.";
+        return;
+      }
+
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          errorMsg.style.color = "#6cfb8a";
+          errorMsg.textContent = "Şifre sıfırlama e-postası gönderildi.";
+        })
+        .catch((error) => {
+          errorMsg.style.color = "#ff6b6b";
+          errorMsg.textContent = error.message;
+        });
+    });
+
+    // Kayıt Ol
+    document.getElementById("register-btn").addEventListener("click", () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if (!email || !password) {
+        errorMsg.textContent = "Lütfen e-posta ve şifreyi doldurun.";
+        return;
+      }
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          window.location.href = "panel.html";
+        })
+        .catch((error) => {
+          errorMsg.textContent = error.message;
+        });
     });
   </script>
 </body>
 </html>
-
