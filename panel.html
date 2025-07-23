@@ -20,7 +20,7 @@
       color: #fff;
     }
 
-    /* Sidebar */
+    /* Yan Menü */
     .sidebar {
       width: 250px;
       background: #2c2c44;
@@ -83,7 +83,7 @@
       background: #d32f2f;
     }
 
-    /* Content */
+    /* İçerik */
     .content {
       flex-grow: 1;
       padding: 40px;
@@ -152,46 +152,49 @@
       projectId: "deneme-giris-3c8e1",
       storageBucket: "deneme-giris-3c8e1.appspot.com",
       messagingSenderId: "808992598321",
-      appId: "1:808992598321:web:38e55dbae8d8b3d8b66810"
+      appId: "1:808992598321:web:38e55dbae8d8b66810"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Kullanıcı doğrulama ve yönlendirme
+    // Kullanıcı oturum kontrolü
     onAuthStateChanged(auth, user => {
       if (!user) {
-        window.location.href = "index.html";
+        window.location.href = "index.html"; // Giriş yoksa index'e at
+      } else {
+        // Kullanıcının e-postasını göster, istersen daha fazla bilgi çekebilirsin
+        const profilBasligi = document.querySelector('.content h1');
+        const profilIcerik = document.querySelector('.content p');
+        profilBasligi.textContent = `Hoşgeldin, ${user.email}!`;
+        profilIcerik.textContent = "Burada profil bilgilerin ve kullanıcı ayarların olacak.";
       }
     });
 
-    // Menü elemanları ve içerik bölümleri
+    // Menü elemanları ve içerik verisi
     const menuItems = document.querySelectorAll('.menu-item');
     const content = document.getElementById('content');
 
     const sections = {
       profile: {
         title: "Profil",
-        content: `<p>Hoşgeldin! Burada profil bilgilerini görebilir, ayarlarını değiştirebilir veya yardım alabilirsin.</p>`
+        content: "<p>Profil bilgilerini burada görüntüleyebilir ve güncelleyebilirsin.</p>"
       },
       settings: {
         title: "Ayarlar",
-        content: `<p>Burada hesap ayarlarını değiştirebilirsin. (Örneğin; e-posta, şifre vb.)</p>`
+        content: "<p>Ayarlar sayfası. Örneğin, şifre değiştirme veya bildirim ayarları.</p>"
       },
       help: {
         title: "Yardım",
-        content: `<p>Herhangi bir sorunun varsa buradan destek alabilirsin.</p>`
+        content: "<p>Yardım ve destek bölümü. Sorular ve iletişim bilgileri burada yer alabilir.</p>"
       }
     };
 
-    // Menü tıklamalarını dinle
     menuItems.forEach(item => {
       item.addEventListener('click', () => {
-        // Aktif menüyü değiştir
         menuItems.forEach(i => i.classList.remove('active'));
         item.classList.add('active');
 
-        // İçeriği değiştir
         const section = item.getAttribute('data-section');
         content.innerHTML = `<h1>${sections[section].title}</h1>${sections[section].content}`;
       });
