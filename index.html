@@ -95,3 +95,30 @@
   <script type="module" src="auth.js"></script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>UID Öğrenme</title>
+</head>
+<body>
+  <h2>UID Öğrenme Sayfası</h2>
+
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const auth = getAuth();
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("Senin UID’n:", user.uid);
+        alert("UID’n konsola yazıldı, kopyala!");
+      } else {
+        console.log("Giriş yapılmamış.");
+      }
+    });
+  </script>
+</body>
+</html>
+
