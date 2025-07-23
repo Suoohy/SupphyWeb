@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kullanıcı Paneli - Supphy Hosting</title>
+  <style>
+    /* Temiz, modern tasarım */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .panel-container {
+      background: rgba(0,0,0,0.5);
+      border-radius: 15px;
+      padding: 30px 40px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 2.5rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+
+    button {
+      background: #ff416c;  /* Pembe-kırmızı degrade */
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      border: none;
+      padding: 15px 30px;
+      font-size: 1rem;
+      border-radius: 50px;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255,65,108,0.5);
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #ff4b2b, #ff416c);
+    }
+  </style>
+</head>
+<body>
+  <div class="panel-container">
+    <h1>Hoşgeldin!</h1>
+    <p>Kullanıcı: <span id="user-email">...</span></p>
+    <button id="logout-btn">Çıkış Yap</button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCI4Kw-lDMWMI6V5WIQPPTVtzzAUic6ZxU",
+      authDomain: "deneme-giris-3c8e1.firebaseapp.com",
+      projectId: "deneme-giris-3c8e1",
+      storageBucket: "deneme-giris-3c8e1.appspot.com",
+      messagingSenderId: "808992598321",
+      appId: "1:808992598321:web:38e55dbae8d8b3d8b66810"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Kullanıcı giriş kontrolü ve e-posta gösterimi
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        document.getElementById('user-email').textContent = user.email;
+      } else {
+        // Giriş yoksa anasayfaya yönlendir
+        window.location.href = "index.html";
+      }
+    });
+
+    // Çıkış yap butonu
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      signOut(auth).then(() => {
+        window.location.href = "index.html";
+      });
+    });
+  </script>
+</body>
+</html>
